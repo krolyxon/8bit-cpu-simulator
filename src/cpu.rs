@@ -1,8 +1,6 @@
-use crate::memory::{self, Memory};
-
-#[derive(Default)]
-#[derive(Debug)]
-pub struct CPU{
+use crate::memory::Memory;
+#[derive(Default, Debug)]
+pub struct CPU {
     pub a: u8,
     pub b: u8,
     pub c: u8,
@@ -27,8 +25,10 @@ impl CPU {
     }
 
     pub fn mov(&mut self, mem: &mut Memory) {
-        let reg = mem.read(self.pc); self.inc_pc();
-        let val = mem.read(self.pc); self.inc_pc();
+        let reg = mem.read(self.pc);
+        self.inc_pc();
+        let val = mem.read(self.pc);
+        self.inc_pc();
 
         match reg {
             0 => self.a = val,
@@ -41,18 +41,13 @@ impl CPU {
         self.zero = val == 0;
     }
 
-    pub fn add(&mut self, mem:&mut Memory) {
-
-        let dest = mem.read(self.pc); self.pc += 1;
-        let src  = mem.read(self.pc); self.pc += 1;
+    pub fn add(&mut self, mem: &mut Memory) {
+        let dest = mem.read(self.pc);
+        self.pc += 1;
+        let src = mem.read(self.pc);
+        self.pc += 1;
 
         let (result, carry) = match (dest, src) {
-            // What the fuck do these tuples mean?
-            // so basically they are the numbers assigned to register
-            // 0 => A, 1 => B ....
-            // so when it is (0, 0), it basically says add the
-            // value of register B into register A,
-            // thats exactly whats replicated in the code below
             (0, 0) => self.a.overflowing_add(self.a),
             (0, 1) => self.a.overflowing_add(self.b),
             (0, 2) => self.a.overflowing_add(self.c),
@@ -89,16 +84,12 @@ impl CPU {
     }
 
     pub fn sub(&mut self, mem: &mut Memory) {
-        let dest = mem.read(self.pc); self.pc += 1;
-        let src  = mem.read(self.pc); self.pc += 1;
+        let dest = mem.read(self.pc);
+        self.pc += 1;
+        let src = mem.read(self.pc);
+        self.pc += 1;
 
         let (result, borrow) = match (dest, src) {
-            // What the fuck do these tuples mean?
-            // so basically they are the numbers assigned to register
-            // 0 => A, 1 => B ....
-            // so when it is (0, 0), it basically says add the
-            // value of register B into register A,
-            // thats exactly whats replicated in the code below
             (0, 0) => self.a.overflowing_sub(self.a),
             (0, 1) => self.a.overflowing_sub(self.b),
             (0, 2) => self.a.overflowing_sub(self.c),
@@ -135,8 +126,10 @@ impl CPU {
     }
 
     pub fn jmp(&mut self, mem: &mut Memory) {
-        let low = mem.read(self.pc) as u16; self.inc_pc();
-        let high = mem.read(self.pc) as u16; self.inc_pc();
+        let low = mem.read(self.pc) as u16;
+        self.inc_pc();
+        let high = mem.read(self.pc) as u16;
+        self.inc_pc();
 
         let addrs = (high << 8) | low;
 
@@ -144,8 +137,10 @@ impl CPU {
     }
 
     pub fn jz(&mut self, mem: &mut Memory) {
-        let low = mem.read(self.pc) as u16; self.inc_pc();
-        let high = mem.read(self.pc) as u16; self.inc_pc();
+        let low = mem.read(self.pc) as u16;
+        self.inc_pc();
+        let high = mem.read(self.pc) as u16;
+        self.inc_pc();
 
         let addrs = (high << 8) | low;
 
@@ -154,9 +149,11 @@ impl CPU {
         }
     }
 
- pub fn jnz(&mut self, mem: &mut Memory) {
-        let low = mem.read(self.pc) as u16; self.inc_pc();
-        let high = mem.read(self.pc) as u16; self.inc_pc();
+    pub fn jnz(&mut self, mem: &mut Memory) {
+        let low = mem.read(self.pc) as u16;
+        self.inc_pc();
+        let high = mem.read(self.pc) as u16;
+        self.inc_pc();
 
         let addrs = (high << 8) | low;
 
@@ -164,6 +161,4 @@ impl CPU {
             self.pc = addrs;
         }
     }
-
-
 }

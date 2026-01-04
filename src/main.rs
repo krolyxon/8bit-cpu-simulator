@@ -3,14 +3,12 @@ mod instructions;
 mod memory;
 
 use cpu::CPU;
-use memory::Memory;
 use instructions::Instruction;
+use memory::Memory;
 
 fn main() {
     let mut cpu = CPU::default();
     let mut mem = Memory::new();
-
-
 
     // a = 10
     mem.write(0x0000, Instruction::MOV as u8);
@@ -45,17 +43,16 @@ fn main() {
         cpu.inc_pc();
 
         match opcode {
-            x if x == Instruction::MOV as u8 =>  cpu.mov(&mut mem),
+            x if x == Instruction::MOV as u8 => cpu.mov(&mut mem),
             x if x == Instruction::ADD as u8 => cpu.add(&mut mem),
             x if x == Instruction::SUB as u8 => cpu.sub(&mut mem),
             x if x == Instruction::JMP as u8 => cpu.jmp(&mut mem),
-            x if x == Instruction::JZ  as u8 => cpu.jz(&mut mem),
-            x if x == Instruction::JNZ  as u8 => cpu.jnz(&mut mem),
+            x if x == Instruction::JZ as u8 => cpu.jz(&mut mem),
+            x if x == Instruction::JNZ as u8 => cpu.jnz(&mut mem),
             x if x == Instruction::HLT as u8 => cpu.halt(),
             _ => panic!("Unknown opcode {:02X}", opcode),
         }
     }
 
     println!("{:#?}", cpu);
-
 }
