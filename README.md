@@ -9,8 +9,13 @@
 5. JZ (Jump if not zero)
 6. HLT (Halt)
 
+# Usage
+```bash
+cargo run -- --f <filename.asc>
+```
+
 ## Todo
-- [ ] Assembler
-    - [ ] Lexer/Tokenizer
+- [x] Assembler
+    - [x] Lexer/Tokenizer
 - [ ] Error handling
 - [ ] Build Debugger
