@@ -20,7 +20,7 @@ fn main() {
     // b = 2
     mem.write(0x0003, Instruction::MOV as u8);
     mem.write(0x0004, 1);
-    mem.write(0x0005, 5);
+    mem.write(0x0005, 3);
 
     // a = a + b
     mem.write(0x0006, Instruction::SUB as u8);
@@ -28,7 +28,7 @@ fn main() {
     mem.write(0x0008, 1);
 
     // JMP to halt
-    mem.write(0x0009, Instruction::JZ as u8);
+    mem.write(0x0009, Instruction::JNZ as u8);
     mem.write(0x000a, 0x0f); // Low
     mem.write(0x000b, 0x00); // High
 
@@ -50,6 +50,7 @@ fn main() {
             x if x == Instruction::SUB as u8 => cpu.sub(&mut mem),
             x if x == Instruction::JMP as u8 => cpu.jmp(&mut mem),
             x if x == Instruction::JZ  as u8 => cpu.jz(&mut mem),
+            x if x == Instruction::JNZ  as u8 => cpu.jnz(&mut mem),
             x if x == Instruction::HLT as u8 => cpu.halt(),
             _ => panic!("Unknown opcode {:02X}", opcode),
         }

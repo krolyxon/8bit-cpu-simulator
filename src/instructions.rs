@@ -5,5 +5,6 @@ pub enum Instruction {
     SUB = 0x03,
     JMP = 0x04,
     JZ = 0x05,
+    JNZ = 0x06,
     HLT = 0xFF,
 }

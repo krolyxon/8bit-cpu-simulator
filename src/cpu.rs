@@ -153,4 +153,17 @@ impl CPU {
 
     }
 
+ pub fn jnz(&mut self, mem: &mut Memory) {
+        let low = mem.read(self.pc) as u16; self.inc_pc();
+        let high = mem.read(self.pc) as u16; self.inc_pc();
+
+        let addrs = (high << 8) | low;
+
+        if !self.zero {
+            self.pc = addrs;
+        }
+
+    }
+
+
 }
