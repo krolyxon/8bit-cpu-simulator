@@ -18,15 +18,20 @@ fn parse_reg(s: &str) -> u8 {
     }
 }
 
-fn instr_size(tokens: &[String]) ->  u16 {
-    match tokens[0].as_str() {
-        "mov" | "add" | "sub" | "jmp" | "jz" | "jnz" => 3,
-        "hlt" => 1,
-        _ => panic!("Unknown instruction {}", tokens[0])
-
+fn is_reg(s: &str) -> bool {
+    match s {
+        "a" | "b" | "c" | "d" => true,
+        _ => false,
     }
 }
 
+fn instr_size(tokens: &[String]) -> u16 {
+    match tokens[0].as_str() {
+        "mov" | "add" | "sub" | "jmp" | "jz" | "jnz" | "cmp" => 3,
+        "hlt" => 1,
+        _ => panic!("Unknown instruction {}", tokens[0]),
+    }
+}
 
 fn first_pass(source: &str) -> HashMap<String, u16> {
     let mut symbols = HashMap::new();
@@ -72,11 +77,17 @@ pub fn assembler(source: &str) -> Vec<u8> {
             "mov" => {
                 // mov reg, imm
                 let reg = parse_reg(&tokens[1]);
-                let imm: u8 = tokens[2].parse().unwrap();
-
-                bytes.push(Instruction::MOV as u8);
-                bytes.push(reg);
-                bytes.push(imm);
+                if is_reg(&tokens[2]) {
+                    let r2 = parse_reg(&tokens[2]);
+                    bytes.push(Instruction::MOV_RR as u8);
+                    bytes.push(reg);
+                    bytes.push(r2);
+                } else {
+                    let imm: u8 = tokens[2].parse().unwrap();
+                    bytes.push(Instruction::MOV_RI as u8);
+                    bytes.push(reg);
+                    bytes.push(imm);
+                }
             }
 
             "add" => {
@@ -91,8 +102,8 @@ pub fn assembler(source: &str) -> Vec<u8> {
 
             "sub" => {
                 // sub a, b
-                let r1 = parse_reg(&tokens[1]);
                 let r2 = parse_reg(&tokens[2]);
+                let r1 = parse_reg(&tokens[1]);
 
                 bytes.push(Instruction::SUB as u8);
                 bytes.push(r1);
@@ -104,7 +115,7 @@ pub fn assembler(source: &str) -> Vec<u8> {
                     "jmp" => Instruction::JMP,
                     "jz" => Instruction::JZ,
                     "jnz" => Instruction::JNZ,
-                    _ => unreachable!()
+                    _ => unreachable!(),
                 };
 
                 let label = &tokens[1];
@@ -113,6 +124,21 @@ pub fn assembler(source: &str) -> Vec<u8> {
                 bytes.push(opcode as u8);
                 bytes.push((addr & 0xFF) as u8); // low
                 bytes.push((addr >> 8) as u8); // high
+            }
+
+            "cmp" => {
+                let r1 = parse_reg(&tokens[1]);
+                if tokens[2].chars().all(|c| c.is_ascii_digit()) {
+                    let imm: u8 = tokens[2].parse().unwrap();
+                    bytes.push(Instruction::CMP_RI as u8);
+                    bytes.push(r1);
+                    bytes.push(imm);
+                } else {
+                    let r2 = parse_reg(&tokens[2]);
+                    bytes.push(Instruction::CMP_RR as u8);
+                    bytes.push(r1);
+                    bytes.push(r2);
+                }
             }
 
             "hlt" => {

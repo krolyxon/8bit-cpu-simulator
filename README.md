@@ -10,12 +10,13 @@
 
 | Instruction | Syntax       |
 | ----------- | ------------ |
-| MOV         | mov reg, imm |
+| MOV         | mov reg, imm OR mov reg, reg |
 | ADD         | add r1, r2   |
 | SUB         | sub r1, r2   |
 | JMP         | jmp addr     |
 | JZ          | jz addr      |
 | JNZ         | jnz addr     |
+| CMP         | cmp reg, imm OR cmp reg, reg     |
 | HLT (Halt)  | hlt          |
 
 
@@ -46,7 +47,7 @@ cargo run -- --f <examples/filename.asc>
     - [x] Lexer/Tokenizer
     - [x] Add label support (supporting JMP/JZ/JNZ)
 - [ ] Add instructions
-    - [ ] CMP
+    - [x] CMP
     - [ ] CALL
     - [ ] RET
 - [ ] Error handling

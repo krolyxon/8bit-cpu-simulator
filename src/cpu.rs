@@ -19,7 +19,6 @@ pub struct CPU {
 }
 
 impl CPU {
-
     pub fn debug_instr(&self, mem: &Memory) {
         let opcode = mem.read(self.pc);
 
@@ -41,12 +40,15 @@ impl CPU {
         self.inc_pc();
 
         match opcode {
-            x if x == Instruction::MOV as u8 => self.mov(mem),
+            x if x == Instruction::MOV_RI as u8 => self.mov_ri(mem),
+            x if x == Instruction::MOV_RR as u8 => self.mov_rr(mem),
             x if x == Instruction::ADD as u8 => self.add(mem),
             x if x == Instruction::SUB as u8 => self.sub(mem),
             x if x == Instruction::JMP as u8 => self.jmp(mem),
             x if x == Instruction::JZ as u8 => self.jz(mem),
             x if x == Instruction::JNZ as u8 => self.jnz(mem),
+            x if x == Instruction::CMP_RI as u8 => self.cmp_ri(mem),
+            x if x == Instruction::CMP_RR as u8 => self.cmp_rr(mem),
             x if x == Instruction::HLT as u8 => self.halt(),
             _ => panic!("Unknown opcode {:02X}", opcode),
         }
@@ -60,7 +62,7 @@ impl CPU {
         self.halted = true;
     }
 
-    pub fn mov(&mut self, mem: &Memory) {
+    pub fn mov_ri(&mut self, mem: &Memory) {
         let reg = mem.read(self.pc);
         self.inc_pc();
         let val = mem.read(self.pc);
@@ -76,6 +78,19 @@ impl CPU {
 
         self.zero = val == 0;
     }
+
+    pub fn mov_rr(&mut self, mem: &Memory) {
+        let dest = mem.read(self.pc);
+        self.inc_pc();
+        let src= mem.read(self.pc);
+        self.inc_pc();
+
+        let val = self.get_reg(src);
+        self.set_reg(dest, val);
+
+        self.zero = val == 0;
+    }
+
 
     pub fn add(&mut self, mem: &Memory) {
         let dest = mem.read(self.pc);
@@ -197,4 +212,55 @@ impl CPU {
             self.pc = addrs;
         }
     }
+
+    pub fn cmp_rr(&mut self, mem: &Memory) {
+        let r1 = mem.read(self.pc);
+        self.inc_pc();
+        let r2 = mem.read(self.pc);
+        self.inc_pc();
+
+        let v1 = self.get_reg(r1);
+        let v2 = self.get_reg(r2);
+
+        let (result, borrow) = v1.overflowing_sub(v2);
+
+        self.zero = result == 0;
+        self.carry = borrow;
+    }
+
+    pub fn cmp_ri(&mut self, mem: &Memory) {
+        let r1 = mem.read(self.pc);
+        self.inc_pc();
+        let r2 = mem.read(self.pc);
+        self.inc_pc();
+
+        let v1 = self.get_reg(r1);
+
+        let (result, borrow) = v1.overflowing_sub(r2);
+
+        self.zero = result == 0;
+        self.carry = borrow;
+    }
+
+
+    fn get_reg(&self, r: u8) -> u8 {
+        match r {
+            0 => self.a,
+            1 => self.b,
+            2 => self.c,
+            3 => self.d,
+            _ => 0,
+        }
+    }
+
+    fn set_reg(&mut self, dest: u8, val: u8) {
+        match dest {
+            0 => self.a = val,
+            1 => self.b = val,
+            2 => self.c = val,
+            3 => self.d = val,
+            _ => {},
+        }
+    }
+
 }
