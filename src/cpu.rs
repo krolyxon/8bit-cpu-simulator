@@ -51,6 +51,8 @@ impl CPU {
             x if x == Instruction::JNZ as u8 => self.jnz(mem),
             x if x == Instruction::CMP_RI as u8 => self.cmp_ri(mem),
             x if x == Instruction::CMP_RR as u8 => self.cmp_rr(mem),
+            x if x == Instruction::MUL as u8 => self.mul(mem),
+            x if x == Instruction::DIV as u8 => self.div(mem),
             x if x == Instruction::HLT as u8 => self.halt(),
             _ => panic!("Unknown opcode {:02X}", opcode),
         }
@@ -298,6 +300,42 @@ impl CPU {
         self.carry = borrow;
     }
 
+    pub fn mul(&mut self, mem: &Memory) {
+        let dest = mem.read(self.pc); self.inc_pc();
+        let src  = mem.read(self.pc); self.inc_pc();
+
+        let lhs = self.get_reg(dest);
+        let rhs = self.get_reg(src);
+
+        let result16 = (lhs as u16) * (rhs as u16);
+        let result8  = (result16 & 0xFF) as u8;
+
+        self.set_reg(dest, result8);
+
+        self.zero  = result8 == 0;
+        self.carry = result16 > 0xFF;
+    }
+
+    pub fn div(&mut self, mem: &Memory) {
+        let dest = mem.read(self.pc); self.inc_pc();
+        let src  = mem.read(self.pc); self.inc_pc();
+
+        let lhs = self.get_reg(dest);
+        let rhs = self.get_reg(src);
+
+        if rhs == 0 {
+            panic!("Division by zero");
+            // OR: set halted = true
+            // OR: define a syscall/exception later
+        }
+
+        let result = lhs / rhs;
+
+        self.set_reg(dest, result);
+
+        self.zero = result == 0;
+        // carry unchanged
+    }
 
     fn get_reg(&self, r: u8) -> u8 {
         match r {
@@ -305,7 +343,7 @@ impl CPU {
             1 => self.b,
             2 => self.c,
             3 => self.d,
-            _ => 0,
+            _ => panic!("Invalid Register"),
         }
     }
 
@@ -315,7 +353,7 @@ impl CPU {
             1 => self.b = val,
             2 => self.c = val,
             3 => self.d = val,
-            _ => {},
+            _ => panic!("Invalid register"),
         }
     }
 

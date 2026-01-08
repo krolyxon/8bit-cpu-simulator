@@ -47,6 +47,8 @@ cargo run -- --f <examples/filename.asc>
     - [x] Add label support (supporting JMP/JZ/JNZ)
 - [ ] Add instructions
     - [x] CMP
+    - [x] MUL
+    - [x] DIV
     - [ ] CALL
     - [ ] RET
 - [ ] Error handling

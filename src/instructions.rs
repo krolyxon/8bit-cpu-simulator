@@ -12,6 +12,8 @@ pub enum Instruction {
     JNZ = 0x06,
     CMP_RI = 0x07,
     CMP_RR = 0x09,
+    MUL = 0x0C,
+    DIV = 0x0D,
     HLT = 0xFF,
 }
 
@@ -25,6 +27,8 @@ impl Instruction {
             0x05 => "JZ",
             0x06 => "JNZ",
             0x07 | 0x09 => "CMP",
+            0x0C => "MUL",
+            0x0D => "DIV",
             0xFF => "HLT",
             _ => "???",
         }

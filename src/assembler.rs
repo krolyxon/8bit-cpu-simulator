@@ -25,7 +25,7 @@ fn is_reg(s: &str) -> bool {
 
 fn instr_size(tokens: &[String]) -> u16 {
     match tokens[0].as_str() {
-        "mov" | "add" | "sub" | "jmp" | "jz" | "jnz" | "cmp" => 3,
+        "mov" | "add" | "sub" | "jmp" | "jz" | "jnz" | "cmp" | "mul" | "div" => 3,
         "hlt" => 1,
         _ => panic!("Unknown instruction {}", tokens[0]),
     }
@@ -151,6 +151,25 @@ pub fn assembler(source: &str) -> Vec<u8> {
                     bytes.push(r1);
                     bytes.push(r2);
                 }
+            }
+
+            "mul" => {
+                let r1 = parse_reg(&tokens[1]);
+                let r2 = parse_reg(&tokens[2]);
+
+                bytes.push(Instruction::MUL as u8);
+                bytes.push(r1);
+                bytes.push(r2);
+
+            }
+
+            "div" => {
+                let r1 = parse_reg(&tokens[1]);
+                let r2 = parse_reg(&tokens[2]);
+
+                bytes.push(Instruction::DIV as u8);
+                bytes.push(r1);
+                bytes.push(r2);
             }
 
             "hlt" => {
