@@ -8,16 +8,20 @@
 
 ## Supported Instructions
 
-| Instruction | Syntax (Reg-Reg) | Syntax (Reg-Imm) |
-| ----------- | ---------------- | ---------------- |
-| MOV         | mov dest, src    | mov reg, imm     |
-| ADD         | add r1, r2       | add reg, imm     |
-| SUB         | sub r1, r2       | sub reg, imm     |
-| JMP         | jmp addr         | jmp addr         |
-| JZ          | jz addr          | jz addr          |
-| JNZ         | jnz addr         | jnz addr         |
-| CMP         | cmp reg, reg     | cmp reg, imp     |
-| HLT (Halt)  | hlt              | hlt              |
+| Instruction | Syntax |
+| ----------- | ---------------- |
+| MOV         | mov dest, src  OR mov reg, imm     |
+| ADD         | add r1, r2     OR add reg, imm     |
+| SUB         | sub r1, r2     OR sub reg, imm     |
+| JMP         | jmp addr       OR jmp addr         |
+| JZ          | jz addr        OR jz addr          |
+| JNZ         | jnz addr       OR jnz addr         |
+| CMP         | cmp r1, r2     OR cmp reg, imp     |
+| MUL         | mul r1, r2     |
+| DIV         | div r1, r2     |
+| CALL        | call \<label\>     |
+| HLT (Halt)  | hlt              |
+
 
 ## Registers
 | Register | Size   | Description                    |
@@ -27,7 +31,7 @@
 | C        | 8-bit  | General                        |
 | D        | 8-bit  | General                        |
 | PC       | 16-bit | Program Counter                |
-| SP       | 16-bit | Stack pointer (unused for now) |
+| SP       | 16-bit | Stack pointer                  |
 
 ## Flags
 | Flag  | Description  |
@@ -49,7 +53,7 @@ cargo run -- --f <examples/filename.asc>
     - [x] CMP
     - [x] MUL
     - [x] DIV
-    - [ ] CALL
-    - [ ] RET
+    - [x] CALL
+    - [x] RET
 - [ ] Error handling
 - [ ] Build Debugger
