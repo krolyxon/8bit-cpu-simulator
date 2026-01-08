@@ -21,7 +21,7 @@ struct Args {
 fn main() {
     let args = Args::parse();
 
-    let mut cpu = CPU::default();
+    let mut cpu = CPU {sp: 0xFFFE, ..Default::default( )};
     let mut mem = Memory::new();
 
     let asm = std::fs::read_to_string(args.filename).unwrap();

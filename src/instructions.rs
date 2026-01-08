@@ -14,6 +14,8 @@ pub enum Instruction {
     CMP_RR = 0x09,
     MUL = 0x0C,
     DIV = 0x0D,
+    CALL = 0x0E,
+    RET = 0x0F,
     HLT = 0xFF,
 }
 
@@ -29,7 +31,10 @@ impl Instruction {
             0x07 | 0x09 => "CMP",
             0x0C => "MUL",
             0x0D => "DIV",
+            0x0E => "CALL",
+            0x0F => "RET",
             0xFF => "HLT",
+
             _ => "???",
         }
     }

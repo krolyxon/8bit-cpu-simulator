@@ -19,6 +19,22 @@ pub struct CPU {
 }
 
 impl CPU {
+    fn push16(&mut self, mem: &mut Memory, val: u16) {
+        self.dec_sp();
+        mem.write(self.sp, (val >> 8) as u8); // high
+        self.dec_sp();
+        mem.write(self.sp, (val & 0xFF) as u8); // low
+    }
+
+    fn pop16(&mut self, mem: &mut Memory) -> u16 {
+        let low = mem.read(self.sp) as u16;
+        self.inc_sp();
+        let high = mem.read(self.sp) as u16;
+        self.inc_sp();
+
+        (high << 8) | low
+    }
+
     pub fn debug_instr(&self, mem: &Memory) {
         let opcode = mem.read(self.pc);
 
@@ -53,6 +69,21 @@ impl CPU {
             x if x == Instruction::CMP_RR as u8 => self.cmp_rr(mem),
             x if x == Instruction::MUL as u8 => self.mul(mem),
             x if x == Instruction::DIV as u8 => self.div(mem),
+            x if x == Instruction::CALL as u8 => {
+                let low  = mem.read(self.pc) as u16; self.inc_pc();
+                let high = mem.read(self.pc) as u16; self.inc_pc();
+                let addr = (high << 8) | low;
+
+                let return_addr = self.pc;
+
+                self.push16(mem, return_addr);
+                self.pc = addr;
+
+            },
+            x if x == Instruction::RET as u8 => {
+                let addr = self.pop16(mem);
+                self.pc = addr;
+            },
             x if x == Instruction::HLT as u8 => self.halt(),
             _ => panic!("Unknown opcode {:02X}", opcode),
         }
@@ -61,6 +92,17 @@ impl CPU {
     pub fn inc_pc(&mut self) {
         self.pc += 1;
     }
+
+    pub fn inc_sp(&mut self) {
+        // self.sp += 1;
+        self.sp = self.sp.wrapping_add(1);
+    }
+
+    pub fn dec_sp(&mut self) {
+        // self.sp -= 1;
+        self.sp = self.sp.wrapping_sub(1);
+    }
+
 
     pub fn halt(&mut self) {
         self.halted = true;
